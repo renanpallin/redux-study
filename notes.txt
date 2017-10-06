@@ -1,0 +1,16 @@
+Redux funciona como o Single Source of True, um obj js
+Tudo que altera o estado deve passar por ele, não se pode simplesmente permitir que alguém altere o estado, tem que dispsrar uma ação.
+O mínimo objeto de ação aceitável é um {type: String}. Não é necessário ser String, mas é recomendado por ser serializável facilmente.
+Reducers são as funções que recebem (currentState, action) e retornam o novo estado.
+Aparentemente quando se muda apenas uma pequena parte do state, o estado antigo é referenciado através dos outros objetos, tornando redux bem rápido. no caso:
+{
+	todos: [...],
+	filter: 'BY_NAME'
+}
+para
+{
+	todos: [...],
+	filter: 'BY_COMPLETED'
+}
+como mudamos apenas o filter, o novo objeto na chave "todos" referencia o "todos" antigo.
+
