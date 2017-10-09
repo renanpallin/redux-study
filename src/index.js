@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import logo from './logo.svg';
 import './App.css';
 import './index.css';
 
@@ -9,13 +8,27 @@ import * as Redux from 'redux';
 const todosReducer = (state = [], action) => {
 	switch (action.type) {
 		case 'ADD_TODO':
-			return [...state, { todo: action.text }]
+			return [...state, { id: action.id, text: action.text, done: false }];
+		case 'TOOGLE_TODO':
+			return state.map(todo => {
+				if (todo.id !== action.todo.id)
+					return todo;
+				return {...todo, done: !action.todo.done}
+			})
+		// case 'REMOVE_TODO':
+		// 	const our = state.findIndex(t => t.id === todo.id);
+		// 	return [
+		// 		...state.slice(0, our),
+		// 		...state.slice(our + 1),
+		// 	];
 		default:
 			return state;
 	}
 }
 
-const store = Redux.createStore(todosReducer)
+const store = Redux.createStore(Redux.combineReducers({
+	todos: todosReducer
+}))
 
 class TodoApp extends React.Component {
 	static defaultProps = {
@@ -26,7 +39,8 @@ class TodoApp extends React.Component {
 		super(props);
 
 		this.state = {
-			todo: ''
+			todo: '',
+			nextId: 0,
 		}
 	}
 
@@ -38,12 +52,13 @@ class TodoApp extends React.Component {
 
 	onAddTodoSubmit(e) {
 		e.preventDefault();
-		this.props.addTodo(this.state.todo)
-		this.setState({ todo: '' });
+		const { nextId, todo } = this.state;
+		this.props.addTodo(nextId, todo)
+		this.setState({ todo: '', nextId: nextId + 1 });
 	}
 
 	render() {
-		const { onAdd, todos } = this.props;
+		const { todos, toogleTodo } = this.props;
 
 		return (
 			<div className="App">
@@ -56,7 +71,13 @@ class TodoApp extends React.Component {
 						<button>+</button>
 					</form>
 					<ul className="todos">
-						{todos.map(({todo}, i) => <li key={i}>{todo}</li>)}
+						{todos.map(todo => (
+							<li key={todo.id}
+								className={`todo ${todo.done ? 'done' : ''}`}
+								onClick={e => toogleTodo(todo)}>
+								{`[${todo.id}] ${todo.text}`}
+							</li>
+						))}
 					</ul>
 				</div>
 			</div>
@@ -66,8 +87,9 @@ class TodoApp extends React.Component {
 
 const render = () => ReactDOM.render(
 	<TodoApp onSubmit={e => console.log('submetendooo!')}
-		todos={store.getState()}
-		addTodo={text => store.dispatch({ type: 'ADD_TODO', text })}
+		todos={store.getState().todos}
+		addTodo={(id, text) => store.dispatch({ type: 'ADD_TODO', id, text })}
+		toogleTodo={todo => store.dispatch({ type: 'TOOGLE_TODO', todo })}
 		/>,
 	document.getElementById('root')
 )
