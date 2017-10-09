@@ -6,55 +6,71 @@ import './index.css';
 
 import * as Redux from 'redux';
 
-class Reducer {
-	constructor(data) {
-		this.data = data
-	}
-
-	get(prop, d) {
-		return this.data[prop] || d;
+const todosReducer = (state = [], action) => {
+	switch (action.type) {
+		case 'ADD_TODO':
+			return [...state, { todo: action.text }]
+		default:
+			return state;
 	}
 }
 
-const reducer = (state = 0, { type }) => new Reducer({
-   'INCREMENT': () => ++state,
-   'DECREMENT': () => --state,
-}).get(type, () => state)()
+const store = Redux.createStore(todosReducer)
 
+class TodoApp extends React.Component {
+	static defaultProps = {
+		todos: [{ todo: 'aa' }]
+	}
 
-// const reducer = (state = 0, action) => {
-// 	console.log(state, action);
-// 	switch (action.type) {
-// 		case 'INCREMENT':
-// 			return ++state;
-// 		case 'DECREMENT':
-// 			return --state;
-// 		default:
-// 			return state;
-// 	}
-// }
+	constructor(props) {
+		super(props);
 
-const store = Redux.createStore(reducer)
-const App = props => (
-	<div className="App">
-		<header className="App-header">
-			<img src={logo} className="App-logo" alt="logo" />
-			<h1 className="App-title">{ props.value }</h1>
+		this.state = {
+			todo: ''
+		}
+	}
 
-			<div className="actions">
-				<button onClick={props.onClickInc}>+</button>
-				<button onClick={props.onClickDec}>-</button>
+	onChange({target: {name, value}}) {
+		this.setState({
+			[name]: value
+		});
+	}
+
+	onAddTodoSubmit(e) {
+		e.preventDefault();
+		this.props.addTodo(this.state.todo)
+		this.setState({ todo: '' });
+	}
+
+	render() {
+		const { onAdd, todos } = this.props;
+
+		return (
+			<div className="App">
+				<div className="bar">
+					<form onSubmit={e => this.onAddTodoSubmit(e)}>
+						<input
+							name="todo" 
+							value={this.state.todo}
+							onChange={e => this.onChange(e)} />
+						<button>+</button>
+					</form>
+					<ul className="todos">
+						{todos.map(({todo}, i) => <li key={i}>{todo}</li>)}
+					</ul>
+				</div>
 			</div>
-		</header>
-	</div>
-);
+		);
+	}
+}
 
 const render = () => ReactDOM.render(
-	<App value={store.getState()}
-		onClickInc={e => store.dispatch({ type : 'INCREMENT' })}
-		onClickDec={e => store.dispatch({ type : 'DECREMENT' })} />,
+	<TodoApp onSubmit={e => console.log('submetendooo!')}
+		todos={store.getState()}
+		addTodo={text => store.dispatch({ type: 'ADD_TODO', text })}
+		/>,
 	document.getElementById('root')
 )
 render()
 store.subscribe(render)
-// registerServiceWorker();
+store.subscribe(_ => console.log('[REDUX]', store.getState()))
