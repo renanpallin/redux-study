@@ -48,9 +48,34 @@ const todosReducer = (state = [], action) => {
 	}
 }
 
+const visibilityReducer = (state = 'ALL', action) => {
+	switch (action.type) {
+		case 'SET_VISIBILITY_FILTER':
+			return action.filter
+		default:
+			return state;
+	}
+}
+
 const store = Redux.createStore(Redux.combineReducers({
-	todos: todosReducer
+	todos: todosReducer,
+	filter: visibilityReducer,
 }))
+
+const FilterChange = ({
+	filter,
+	currentFilter,
+	children
+}) => (filter === currentFilter ? 
+	<span>{children}</span> : 
+	<a href="" onClick={e => {
+		e.preventDefault();
+		store.dispatch({
+			type: 'SET_VISIBILITY_FILTER',
+			filter
+		})
+	}}>{children}</a>
+)
 
 class TodoApp extends React.Component {
 	static defaultProps = {
@@ -80,7 +105,7 @@ class TodoApp extends React.Component {
 	}
 
 	render() {
-		const { todos, toogleTodo } = this.props;
+		const { todos, toogleTodo, filter } = this.props;
 
 		return (
 			<div className="App">
@@ -92,6 +117,13 @@ class TodoApp extends React.Component {
 							onChange={e => this.onChange(e)} />
 						<button>+</button>
 					</form>
+					<div className="filters">
+						<FilterChange filter="ALL" currentFilter={filter}>All</FilterChange>
+						{'  '}
+						<FilterChange filter="ACTIVE" currentFilter={filter}>Active</FilterChange>
+						{'  '}
+						<FilterChange filter="COMPLETED" currentFilter={filter}>Completed</FilterChange>
+					</div>
 					<ul className="todos">
 						{todos.map(todo => (
 							<li key={todo.id}
@@ -107,11 +139,24 @@ class TodoApp extends React.Component {
 	}
 }
 
+const filterTodos = (todos = [], filter) => {
+	switch (filter) {
+		case 'ACTIVE':
+			return todos.filter(todo => !todo.done);
+		case 'COMPLETED':
+			return todos.filter(todo => todo.done);
+		case 'ALL':
+		default:
+			return todos;
+	}
+}
+
 const render = () => ReactDOM.render(
 	<TodoApp onSubmit={e => console.log('submetendooo!')}
-		todos={store.getState().todos}
+		todos={filterTodos(store.getState().todos, store.getState().filter)}
 		addTodo={(id, text) => store.dispatch({ type: 'ADD_TODO', id, text })}
 		toogleTodo={todo => store.dispatch({ type: 'TOOGLE_TODO', todo })}
+		filter={store.getState().filter}
 		/>,
 	document.getElementById('root')
 )

@@ -8,3 +8,11 @@ body {
 .done {
 	text-decoration: line-through;
 }
+
+li {
+	list-style: none;
+}
+
+.filters {
+	margin-top: 10px;
+}
