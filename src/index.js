@@ -6,6 +6,7 @@ import './App.css';
 import './index.css';
 
 import * as Redux from 'redux';
+import * as ReactRedux from 'react-redux';
 
 const todoReducer = (state = {}, action) => {
 	switch (action.type) {
@@ -254,32 +255,34 @@ class TodoApp extends React.Component {
 	}
 }
 
-class StoreProvider extends React.Component {
-	static childContextTypes = {
-		store: PropTypes.object
-	}
+window.w = ReactRedux;
 
-	getChildContext() {
-		return {
-			store: this.props.store
-		}
-		// This works? I think is slower 'couse 
-		// we're cloning the object store to pass
-		// const { store } = this.props;
-		// return {
-		// 	store
-		// };
-	}
+// class StoreProvider extends React.Component {
+// 	static childContextTypes = {
+// 		store: PropTypes.object
+// 	}
 
-	render() {
-		return this.props.children;
-	}
-}
+// 	getChildContext() {
+// 		return {
+// 			store: this.props.store
+// 		}
+// 		// This works? I think is slower 'couse 
+// 		// we're cloning the object store to pass
+// 		// const { store } = this.props;
+// 		// return {
+// 		// 	store
+// 		// };
+// 	}
+
+// 	render() {
+// 		return this.props.children;
+// 	}
+// }
 
 ReactDOM.render(
-	<StoreProvider store={realStore}>
+	<ReactRedux.Provider store={realStore}>
 		<TodoApp />
-	</StoreProvider>,
+	</ReactRedux.Provider>,
 	document.getElementById('root')
 )
 
