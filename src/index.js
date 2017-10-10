@@ -79,42 +79,83 @@ const Link = ({
 	}}>{children}</a>
 )
 
-class ReduxObserver extends React.Component {
-	static contextTypes = {
-		store: PropTypes.object
-	}
+/* Created before ReactRedux.connect */
+// class ReduxObserver extends React.Component {
+// 	static contextTypes = {
+// 		store: PropTypes.object
+// 	}
 
-	componentDidMount() {
-		this.unsubscribe = this.context.store.subscribe(() => {
-			// console.warn('calling forceUpdate...')
-			this.forceUpdate();
-		});
-	}
+// 	componentDidMount() {
+// 		this.unsubscribe = this.context.store.subscribe(() => {
+// 			// console.warn('calling forceUpdate...')
+// 			this.forceUpdate();
+// 		});
+// 	}
 
-	componentWillUnmount() {
-		this.unsubscribe()
-	}
-}
+// 	componentWillUnmount() {
+// 		this.unsubscribe()
+// 	}
+// }
 
-class FilterChange extends ReduxObserver {
-	static contextTypes = {
-		store: PropTypes.object
-	}
+const FilterChange = ReactRedux.connect(
+	/*  (state, ownProps)  */
+	({ filter: currentFilter }, { filter }) => ({
+		active: currentFilter === filter
+	}),
+	/*  (dispatch, ownProps)  */
+	(dispatch, { filter }) => ({
+		onClick: () => dispatch({
+			type: 'SET_VISIBILITY_FILTER',
+			filter
+		})
+	})
+)(Link);
 
-	render() {
-		const { filter, children } = this.props;
-		const { filter: currentFilter } = this.context.store.getState();
-		return (
-			<Link active={ filter === currentFilter }
-				onClick={() => this.context.store.dispatch({
-					type: 'SET_VISIBILITY_FILTER',
-					filter
-				})}>
-				{children}
-			</Link>
-		)
-	}
-}
+/* Ultra mega anonymous way */
+// const FilterChange = ReactRedux.connect(
+// 	/*  (state, ownProps)  */
+// 	({ filter: currentFilter }, { filter }) => ({
+// 		active: currentFilter === filter
+// 	}),
+// 	/*  (dispatch, ownProps)  */
+// 	(dispatch, { filter }) => ({
+// 		onClick: () => dispatch({
+// 					type: 'SET_VISIBILITY_FILTER',
+// 					filter
+// 				})
+// 	})
+// )(
+//   /* Link component */ 
+// 	({ active, onClick, children }) => (
+// 		active ? <span>{ children }</span> :
+// 		<a href="" onClick={e => {
+// 			e.preventDefault();
+// 			onClick(e);
+// 		}}>{children}</a>
+// 	)
+// );
+
+
+/* Class way */
+// class FilterChange extends ReduxObserver {
+// 	static contextTypes = {
+// 		store: PropTypes.object
+// 	}
+
+// 	render() {
+// 		const { filter, children } = this.props;
+// 		const { filter: currentFilter } = this.context.store.getState();
+// 		return (
+// 			<Link active={ filter === currentFilter }
+// 				onClick={() => this.context.store.dispatch({
+// 					type: 'SET_VISIBILITY_FILTER',
+// 					filter
+// 				})}>
+// 				{children}
+// 			</Link>
+// 		)
+// 	}
+// }
 
 const Todo = ({
 	onClick,
@@ -229,6 +270,11 @@ const VisibleTodoList = ReactRedux.connect(
 	mapStateToProps,
 	mapDispatchToProps
 )(TodoList);
+
+/*
+Chamar o connect() sem argumentos resulta em:
+connect(null, dispatch => { dispatch })
+ */
 
 /* anonymous function way */
 // const VisibleTodoList = ReactRedux.connect(
