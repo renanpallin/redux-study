@@ -62,6 +62,8 @@ const store = Redux.createStore(Redux.combineReducers({
 	filter: visibilityReducer,
 }))
 
+
+////// Components
 const FilterChange = ({
 	filter,
 	currentFilter,
@@ -79,7 +81,7 @@ const FilterChange = ({
 
 class TodoApp extends React.Component {
 	static defaultProps = {
-		todos: [{ todo: 'aa' }]
+		todos: []
 	}
 
 	constructor(props) {
@@ -117,23 +119,23 @@ class TodoApp extends React.Component {
 							onChange={e => this.onChange(e)} />
 						<button>+</button>
 					</form>
-					<div className="filters">
-						<FilterChange filter="ALL" currentFilter={filter}>All</FilterChange>
-						{'  '}
-						<FilterChange filter="ACTIVE" currentFilter={filter}>Active</FilterChange>
-						{'  '}
-						<FilterChange filter="COMPLETED" currentFilter={filter}>Completed</FilterChange>
-					</div>
-					<ul className="todos">
-						{todos.map(todo => (
-							<li key={todo.id}
-								className={`todo ${todo.done ? 'done' : ''}`}
-								onClick={e => toogleTodo(todo)}>
-								{`[${todo.id}] ${todo.text}`}
-							</li>
-						))}
-					</ul>
 				</div>
+				<div className="filters">
+					<FilterChange filter="ALL" currentFilter={filter}>All</FilterChange>
+					{'  '}
+					<FilterChange filter="ACTIVE" currentFilter={filter}>Active</FilterChange>
+					{'  '}
+					<FilterChange filter="COMPLETED" currentFilter={filter}>Completed</FilterChange>
+				</div>
+				<ul className="todos">
+					{todos.map(todo => (
+						<li key={todo.id}
+							className={`todo ${todo.done ? 'done' : ''}`}
+							onClick={e => toogleTodo(todo)}>
+							{`[${todo.id}] ${todo.text}`}
+						</li>
+					))}
+				</ul>
 			</div>
 		);
 	}
