@@ -64,20 +64,44 @@ const store = Redux.createStore(Redux.combineReducers({
 
 
 ////// Components
-const FilterChange = ({
-	filter,
-	currentFilter,
-	children
-}) => (filter === currentFilter ? 
-	<span>{children}</span> : 
+const Link = ({
+	active,
+	onClick = _ => 0,
+	children,
+}) => (
+	active ? <span>{ children }</span> :
 	<a href="" onClick={e => {
 		e.preventDefault();
-		store.dispatch({
-			type: 'SET_VISIBILITY_FILTER',
-			filter
-		})
+		onClick(e);
 	}}>{children}</a>
 )
+
+class FilterChange extends React.Component {
+	componentDidMount() {
+		this.unsubscribe = store.subscribe(() => {
+			// console.warn('calling forceUpdate...')
+			this.forceUpdate();
+		});
+	}
+
+	componentWillUnmount() {
+		this.unsubscribe()
+	}
+
+	render() {
+		const { filter, children } = this.props;
+		const { filter: currentFilter } = store.getState();
+		return (
+			<Link active={ filter === currentFilter }
+				onClick={() => store.dispatch({
+					type: 'SET_VISIBILITY_FILTER',
+					filter
+				})}>
+				{children}
+			</Link>
+		)
+	}
+}
 
 const Todo = ({
 	onClick,
@@ -120,8 +144,7 @@ const AddTodoForm = ({
 )
 
 const TodosFilterSettings = ({
-	filters,
-	currentFilter
+	filters
 }) => (
 	<div className="filters">
 		{filters.map(({
@@ -129,8 +152,7 @@ const TodosFilterSettings = ({
 			value
 		}, i) => [
 			<FilterChange key={i}
-				filter={label}
-				currentFilter={currentFilter}>
+				filter={label}>
 					{ value }
 			</FilterChange>,
 			' '
@@ -167,8 +189,9 @@ class TodoApp extends React.Component {
 	}
 
 	render() {
-		const { todos, toogleTodo, filter } = this.props;
+		const { todos, toogleTodo } = this.props;
 
+		/* Poderia ficar no próprio TodosFilterSettings, mas acho que tem amis a ver com a aplicação */
 		const filters = [
 			{ label: 'ALL', value: 'All' },
 			{ label: 'ACTIVE', value: 'Active' },
@@ -180,7 +203,7 @@ class TodoApp extends React.Component {
 					onSubmit={e => this.onAddTodoSubmit(e)}
 					value={this.state.todo}
 					onChange={e => this.onChange(e)} />
-				<TodosFilterSettings filters={filters} currentFilter={filter} />
+				<TodosFilterSettings filters={filters} />
 				<TodoList onClickTodo={todo => toogleTodo(todo)} todos={todos} />
 			</div>
 		);
