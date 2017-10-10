@@ -8,6 +8,25 @@ import './index.css';
 import * as Redux from 'redux';
 import * as ReactRedux from 'react-redux';
 
+let nextId = 0;
+
+////// Action
+const Action = {
+	setVisibilityFilter: filter => ({
+		type: 'SET_VISIBILITY_FILTER',
+		filter
+	}),
+	addTodo: text => ({ 
+		type: 'ADD_TODO',
+		id: ++nextId,
+		text
+	}),
+	toogleTodo: todo => ({
+		type: 'TOOGLE_TODO',
+		todo
+	})
+}
+
 ////// Reducers
 const todoReducer = (state = {}, action) => {
 	switch (action.type) {
@@ -106,10 +125,7 @@ const FilterChange = ReactRedux.connect(
 	}),
 	/*  (dispatch, ownProps)  */
 	(dispatch, { filter }) => ({
-		onClick: () => dispatch({
-			type: 'SET_VISIBILITY_FILTER',
-			filter
-		})
+		onClick: () => dispatch(Action.setVisibilityFilter(filter))
 	})
 )(Link);
 
@@ -193,20 +209,16 @@ class AddTodoForm extends React.Component {
 		super(props);
 
 		this.state = {
-			text: '',
-			nextId: 0,
+			text: ''
 		}
 	}
 
 	onAddTodoSubmit(e) {
 		e.preventDefault();
-		const { nextId: id, text } = this.state;
-		this.context.store.dispatch({ 
-			type: 'ADD_TODO',
-			id, text
-		})
+		const { text } = this.state;
+		this.context.store.dispatch(Action.addTodo(text))
 		// this.props.addTodo(nextId, text)
-		this.setState({ text: '', nextId: id + 1 });
+		this.setState({ text: '' });
 	}
 
 	onChange({target: {name, value}}) {
@@ -266,7 +278,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-	onClickTodo: todo => dispatch({ type: 'TOOGLE_TODO', todo })
+	onClickTodo: todo => dispatch(Action.toogleTodo(todo))
 });
 
 const VisibleTodoList = ReactRedux.connect(
