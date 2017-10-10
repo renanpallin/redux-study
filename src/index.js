@@ -129,21 +129,47 @@ const TodoList = ({
 	</ul>
 )
 
-const AddTodoForm = ({
-	value,
-	onSubmit,
-	onChange
-}) => (
-	<div className="bar">
-		<form onSubmit={onSubmit}>
-			<input
-				name="text" 
-				value={value}
-				onChange={onChange} />
-			<button>+</button>
-		</form>
-	</div>
-)
+class AddTodoForm extends React.Component {
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			text: '',
+			nextId: 0,
+		}
+	}
+
+	onAddTodoSubmit(e) {
+		e.preventDefault();
+		const { nextId: id, text } = this.state;
+		store.dispatch({ 
+			type: 'ADD_TODO',
+			id, text
+		})
+		// this.props.addTodo(nextId, text)
+		this.setState({ text: '', nextId: id + 1 });
+	}
+
+	onChange({target: {name, value}}) {
+		this.setState({
+			[name]: value
+		});
+	}
+
+	render() {
+		return (
+			<div className="bar">
+				<form onSubmit={e => this.onAddTodoSubmit(e)}>
+					<input
+						name="text" 
+						value={this.state.text}
+						onChange={e => this.onChange(e)} />
+					<button>+</button>
+				</form>
+			</div>
+		)	
+	}
+}
 
 const TodosFilterSettings = ({
 	filters
@@ -196,32 +222,6 @@ class TodoApp extends React.Component {
 		todos: []
 	}
 
-	constructor(props) {
-		super(props);
-
-		this.state = {
-			text: '',
-			nextId: 0,
-		}
-	}
-
-	onChange({target: {name, value}}) {
-		this.setState({
-			[name]: value
-		});
-	}
-
-	onAddTodoSubmit(e) {
-		e.preventDefault();
-		const { nextId: id, text } = this.state;
-		store.dispatch({ 
-			type: 'ADD_TODO',
-			id, text
-		})
-		// this.props.addTodo(nextId, text)
-		this.setState({ text: '', nextId: id + 1 });
-	}
-
 	render() {
 		/* Poderia ficar no próprio TodosFilterSettings, mas acho que tem amis a ver com a aplicação */
 		const filters = [
@@ -232,10 +232,7 @@ class TodoApp extends React.Component {
 
 		return (
 			<div className="App">
-				<AddTodoForm 
-					onSubmit={e => this.onAddTodoSubmit(e)}
-					value={this.state.text}
-					onChange={e => this.onChange(e)} />
+				<AddTodoForm />
 				<TodosFilterSettings filters={filters} />
 				<VisibleTodoList />
 			</div>
@@ -249,3 +246,4 @@ ReactDOM.render(
 )
 
 store.subscribe(_ => console.log('[REDUX]', store.getState()))
+// store.subscribe(_ => console.log.bind(5, '[REDUX]')(store.getState())) // =)
