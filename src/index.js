@@ -135,7 +135,7 @@ const AddTodoForm = ({
 	<div className="bar">
 		<form onSubmit={onSubmit}>
 			<input
-				name="todo" 
+				name="text" 
 				value={value}
 				onChange={onChange} />
 			<button>+</button>
@@ -161,6 +161,34 @@ const TodosFilterSettings = ({
 	</div>
 )
 
+class VisibleTodoList extends React.Component {
+	filterTodos(todos = [], filter) {
+		switch (filter) {
+			case 'ACTIVE':
+				return todos.filter(todo => !todo.done);
+			case 'COMPLETED':
+				return todos.filter(todo => todo.done);
+			case 'ALL':
+			default:
+				return todos;
+		}
+	}
+
+	toogleTodo(todo) {
+		store.dispatch({ type: 'TOOGLE_TODO', todo })
+	}
+
+	render() {
+		const { todos, filter } = store.getState();
+		const visibleTodos = this.filterTodos(todos, filter);
+
+		return (
+			<TodoList todos={visibleTodos}
+				onClickTodo={todo => this.toogleTodo(todo)}  />
+		);
+	}
+}
+
 class TodoApp extends React.Component {
 	static defaultProps = {
 		todos: []
@@ -170,7 +198,7 @@ class TodoApp extends React.Component {
 		super(props);
 
 		this.state = {
-			todo: '',
+			text: '',
 			nextId: 0,
 		}
 	}
@@ -183,52 +211,38 @@ class TodoApp extends React.Component {
 
 	onAddTodoSubmit(e) {
 		e.preventDefault();
-		const { nextId, todo } = this.state;
-		this.props.addTodo(nextId, todo)
-		this.setState({ todo: '', nextId: nextId + 1 });
+		const { nextId: id, text } = this.state;
+		store.dispatch({ 
+			type: 'ADD_TODO',
+			id, text
+		})
+		// this.props.addTodo(nextId, text)
+		this.setState({ text: '', nextId: id + 1 });
 	}
 
 	render() {
-		const { todos, toogleTodo } = this.props;
-
 		/* Poderia ficar no próprio TodosFilterSettings, mas acho que tem amis a ver com a aplicação */
 		const filters = [
 			{ label: 'ALL', value: 'All' },
 			{ label: 'ACTIVE', value: 'Active' },
 			{ label: 'COMPLETED', value: 'Completed' },
 		];
+		
 		return (
 			<div className="App">
 				<AddTodoForm 
 					onSubmit={e => this.onAddTodoSubmit(e)}
-					value={this.state.todo}
+					value={this.state.text}
 					onChange={e => this.onChange(e)} />
 				<TodosFilterSettings filters={filters} />
-				<TodoList onClickTodo={todo => toogleTodo(todo)} todos={todos} />
+				<VisibleTodoList />
 			</div>
 		);
 	}
 }
 
-const filterTodos = (todos = [], filter) => {
-	switch (filter) {
-		case 'ACTIVE':
-			return todos.filter(todo => !todo.done);
-		case 'COMPLETED':
-			return todos.filter(todo => todo.done);
-		case 'ALL':
-		default:
-			return todos;
-	}
-}
-
 const render = () => ReactDOM.render(
-	<TodoApp onSubmit={e => console.log('submetendooo!')}
-		todos={filterTodos(store.getState().todos, store.getState().filter)}
-		addTodo={(id, text) => store.dispatch({ type: 'ADD_TODO', id, text })}
-		toogleTodo={todo => store.dispatch({ type: 'TOOGLE_TODO', todo })}
-		filter={store.getState().filter}
-		/>,
+	<TodoApp />,
 	document.getElementById('root')
 )
 render()
