@@ -1,5 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import PropTypes from 'prop-types';
+
 import './App.css';
 import './index.css';
 
@@ -57,7 +59,7 @@ const visibilityReducer = (state = 'ALL', action) => {
 	}
 }
 
-const store = Redux.createStore(Redux.combineReducers({
+const realStore = Redux.createStore(Redux.combineReducers({
 	todos: todosReducer,
 	filter: visibilityReducer,
 }))
@@ -77,8 +79,12 @@ const Link = ({
 )
 
 class ReduxObserver extends React.Component {
+	static contextTypes = {
+		store: PropTypes.object
+	}
+
 	componentDidMount() {
-		this.unsubscribe = store.subscribe(() => {
+		this.unsubscribe = this.context.store.subscribe(() => {
 			// console.warn('calling forceUpdate...')
 			this.forceUpdate();
 		});
@@ -90,12 +96,16 @@ class ReduxObserver extends React.Component {
 }
 
 class FilterChange extends ReduxObserver {
+	static contextTypes = {
+		store: PropTypes.object
+	}
+
 	render() {
 		const { filter, children } = this.props;
-		const { filter: currentFilter } = store.getState();
+		const { filter: currentFilter } = this.context.store.getState();
 		return (
 			<Link active={ filter === currentFilter }
-				onClick={() => store.dispatch({
+				onClick={() => this.context.store.dispatch({
 					type: 'SET_VISIBILITY_FILTER',
 					filter
 				})}>
@@ -130,6 +140,10 @@ const TodoList = ({
 )
 
 class AddTodoForm extends React.Component {
+	static contextTypes = {
+		store: PropTypes.object
+	}
+
 	constructor(props) {
 		super(props);
 
@@ -142,7 +156,7 @@ class AddTodoForm extends React.Component {
 	onAddTodoSubmit(e) {
 		e.preventDefault();
 		const { nextId: id, text } = this.state;
-		store.dispatch({ 
+		this.context.store.dispatch({ 
 			type: 'ADD_TODO',
 			id, text
 		})
@@ -190,6 +204,10 @@ const TodosFilterSettings = ({
 )
 
 class VisibleTodoList extends ReduxObserver {
+	static contextTypes = {
+		store: PropTypes.object
+	}
+
 	filterTodos(todos = [], filter) {
 		switch (filter) {
 			case 'ACTIVE':
@@ -203,11 +221,11 @@ class VisibleTodoList extends ReduxObserver {
 	}
 
 	toogleTodo(todo) {
-		store.dispatch({ type: 'TOOGLE_TODO', todo })
+		this.context.store.dispatch({ type: 'TOOGLE_TODO', todo })
 	}
 
 	render() {
-		const { todos, filter } = store.getState();
+		const { todos, filter } = this.context.store.getState();
 		const visibleTodos = this.filterTodos(todos, filter);
 
 		return (
@@ -218,10 +236,6 @@ class VisibleTodoList extends ReduxObserver {
 }
 
 class TodoApp extends React.Component {
-	static defaultProps = {
-		todos: []
-	}
-
 	render() {
 		/* Poderia ficar no próprio TodosFilterSettings, mas acho que tem amis a ver com a aplicação */
 		const filters = [
@@ -240,10 +254,34 @@ class TodoApp extends React.Component {
 	}
 }
 
+class StoreProvider extends React.Component {
+	static childContextTypes = {
+		store: PropTypes.object
+	}
+
+	getChildContext() {
+		return {
+			store: this.props.store
+		}
+		// This works? I think is slower 'couse 
+		// we're cloning the object store to pass
+		// const { store } = this.props;
+		// return {
+		// 	store
+		// };
+	}
+
+	render() {
+		return this.props.children;
+	}
+}
+
 ReactDOM.render(
-	<TodoApp />,
+	<StoreProvider store={realStore}>
+		<TodoApp />
+	</StoreProvider>,
 	document.getElementById('root')
 )
 
-store.subscribe(_ => console.log('[REDUX]', store.getState()))
+realStore.subscribe(_ => console.log('[REDUX]', realStore.getState()))
 // store.subscribe(_ => console.log.bind(5, '[REDUX]')(store.getState())) // =)
