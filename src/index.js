@@ -76,7 +76,7 @@ const Link = ({
 	}}>{children}</a>
 )
 
-class FilterChange extends React.Component {
+class ReduxObserver extends React.Component {
 	componentDidMount() {
 		this.unsubscribe = store.subscribe(() => {
 			// console.warn('calling forceUpdate...')
@@ -87,7 +87,9 @@ class FilterChange extends React.Component {
 	componentWillUnmount() {
 		this.unsubscribe()
 	}
+}
 
+class FilterChange extends ReduxObserver {
 	render() {
 		const { filter, children } = this.props;
 		const { filter: currentFilter } = store.getState();
@@ -161,7 +163,7 @@ const TodosFilterSettings = ({
 	</div>
 )
 
-class VisibleTodoList extends React.Component {
+class VisibleTodoList extends ReduxObserver {
 	filterTodos(todos = [], filter) {
 		switch (filter) {
 			case 'ACTIVE':
@@ -227,7 +229,7 @@ class TodoApp extends React.Component {
 			{ label: 'ACTIVE', value: 'Active' },
 			{ label: 'COMPLETED', value: 'Completed' },
 		];
-		
+
 		return (
 			<div className="App">
 				<AddTodoForm 
@@ -241,10 +243,9 @@ class TodoApp extends React.Component {
 	}
 }
 
-const render = () => ReactDOM.render(
+ReactDOM.render(
 	<TodoApp />,
 	document.getElementById('root')
 )
-render()
-store.subscribe(render)
+
 store.subscribe(_ => console.log('[REDUX]', store.getState()))
