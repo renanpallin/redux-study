@@ -204,37 +204,58 @@ const TodosFilterSettings = ({
 	</div>
 )
 
-class VisibleTodoList extends ReduxObserver {
-	static contextTypes = {
-		store: PropTypes.object
-	}
-
-	filterTodos(todos = [], filter) {
-		switch (filter) {
-			case 'ACTIVE':
-				return todos.filter(todo => !todo.done);
-			case 'COMPLETED':
-				return todos.filter(todo => todo.done);
-			case 'ALL':
-			default:
-				return todos;
-		}
-	}
-
-	toogleTodo(todo) {
-		this.context.store.dispatch({ type: 'TOOGLE_TODO', todo })
-	}
-
-	render() {
-		const { todos, filter } = this.context.store.getState();
-		const visibleTodos = this.filterTodos(todos, filter);
-
-		return (
-			<TodoList todos={visibleTodos}
-				onClickTodo={todo => this.toogleTodo(todo)}  />
-		);
+const filterTodos = (todos = [], filter) => {
+	switch (filter) {
+		case 'ACTIVE':
+			return todos.filter(todo => !todo.done);
+		case 'COMPLETED':
+			return todos.filter(todo => todo.done);
+		case 'ALL':
+		default:
+			return todos;
 	}
 }
+
+/* traditional way */
+const mapStateToProps = state => ({
+	todos: filterTodos(state.todos, state.filter)
+});
+
+const mapDispatchToProps = dispatch => ({
+	onClickTodo: todo => dispatch({ type: 'TOOGLE_TODO', todo })
+});
+
+const VisibleTodoList = ReactRedux.connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(TodoList);
+
+/* anonymous function way */
+// const VisibleTodoList = ReactRedux.connect(
+// 	state => ({ todos: filterTodos(state.todos, state.filter) }),
+// 	dispatch => ({ onClickTodo: todo => dispatch({ type: 'TOOGLE_TODO', todo }) }),
+// )(TodoList);
+
+/* class way */
+// class VisibleTodoList extends ReduxObserver {
+// 	static contextTypes = {
+// 		store: PropTypes.object
+// 	}
+
+// 	toogleTodo(todo) {
+// 		this.context.store.dispatch({ type: 'TOOGLE_TODO', todo })
+// 	}
+
+// 	render() {
+// 		const { todos, filter } = this.context.store.getState();
+// 		const visibleTodos = filterTodos(todos, filter);
+
+// 		return (
+// 			<TodoList todos={visibleTodos}
+// 				onClickTodo={todo => this.toogleTodo(todo)}  />
+// 		);
+// 	}
+// }
 
 class TodoApp extends React.Component {
 	render() {
