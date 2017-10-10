@@ -8,6 +8,7 @@ import './index.css';
 import * as Redux from 'redux';
 import * as ReactRedux from 'react-redux';
 
+////// Reducers
 const todoReducer = (state = {}, action) => {
 	switch (action.type) {
 		case 'ADD_TODO':
@@ -60,6 +61,7 @@ const visibilityReducer = (state = 'ALL', action) => {
 	}
 }
 
+////// Store
 const realStore = Redux.createStore(Redux.combineReducers({
 	todos: todosReducer,
 	filter: visibilityReducer,
@@ -181,6 +183,7 @@ const TodoList = ({
 	</ul>
 )
 
+/* Não refatorado pelo uso do state */
 class AddTodoForm extends React.Component {
 	static contextTypes = {
 		store: PropTypes.object
@@ -321,8 +324,6 @@ class TodoApp extends React.Component {
 		);
 	}
 }
-
-window.w = ReactRedux;
 
 // class StoreProvider extends React.Component {
 // 	static childContextTypes = {
