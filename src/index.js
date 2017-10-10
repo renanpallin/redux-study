@@ -79,6 +79,66 @@ const FilterChange = ({
 	}}>{children}</a>
 )
 
+const Todo = ({
+	onClick,
+	todo
+}) => (
+	<li className={`todo ${todo.done ? 'done' : ''}`}
+		onClick={e => onClick(todo)}>
+		{`[${todo.id}] ${todo.text}`}
+	</li>
+)
+
+const TodoList = ({
+	todos,
+	onClickTodo,
+}) => (
+	<ul className="todos">
+		{todos.map(todo => (
+			<Todo key={todo.id}
+				onClick={onClickTodo}
+				todo={todo}
+			 />
+		))}
+	</ul>
+)
+
+const AddTodoForm = ({
+	value,
+	onSubmit,
+	onChange
+}) => (
+	<div className="bar">
+		<form onSubmit={onSubmit}>
+			<input
+				name="todo" 
+				value={value}
+				onChange={onChange} />
+			<button>+</button>
+		</form>
+	</div>
+)
+
+const TodosFilterSettings = ({
+	filters,
+	currentFilter
+}) => (
+	<div className="filters">
+		{filters.map(({
+			label,
+			value
+		}, i) => [
+			<FilterChange key={i}
+				filter={label}
+				currentFilter={currentFilter}>
+					{ value }
+			</FilterChange>,
+			' '
+			]
+		)}
+	</div>
+)
+
 class TodoApp extends React.Component {
 	static defaultProps = {
 		todos: []
@@ -109,33 +169,19 @@ class TodoApp extends React.Component {
 	render() {
 		const { todos, toogleTodo, filter } = this.props;
 
+		const filters = [
+			{ label: 'ALL', value: 'All' },
+			{ label: 'ACTIVE', value: 'Active' },
+			{ label: 'COMPLETED', value: 'Completed' },
+		];
 		return (
 			<div className="App">
-				<div className="bar">
-					<form onSubmit={e => this.onAddTodoSubmit(e)}>
-						<input
-							name="todo" 
-							value={this.state.todo}
-							onChange={e => this.onChange(e)} />
-						<button>+</button>
-					</form>
-				</div>
-				<div className="filters">
-					<FilterChange filter="ALL" currentFilter={filter}>All</FilterChange>
-					{'  '}
-					<FilterChange filter="ACTIVE" currentFilter={filter}>Active</FilterChange>
-					{'  '}
-					<FilterChange filter="COMPLETED" currentFilter={filter}>Completed</FilterChange>
-				</div>
-				<ul className="todos">
-					{todos.map(todo => (
-						<li key={todo.id}
-							className={`todo ${todo.done ? 'done' : ''}`}
-							onClick={e => toogleTodo(todo)}>
-							{`[${todo.id}] ${todo.text}`}
-						</li>
-					))}
-				</ul>
+				<AddTodoForm 
+					onSubmit={e => this.onAddTodoSubmit(e)}
+					value={this.state.todo}
+					onChange={e => this.onChange(e)} />
+				<TodosFilterSettings filters={filters} currentFilter={filter} />
+				<TodoList onClickTodo={todo => toogleTodo(todo)} todos={todos} />
 			</div>
 		);
 	}
