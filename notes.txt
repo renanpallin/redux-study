@@ -14,3 +14,8 @@ para
 }
 como mudamos apenas o filter, o novo objeto na chave "todos" referencia o "todos" antigo.
 
+
+
+Mandameentos:
+	classes definem comportamento
+	function components são apenas UI

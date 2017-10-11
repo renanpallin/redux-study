@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 
 import './App.css';
 import './index.css';
@@ -8,97 +8,22 @@ import './index.css';
 import * as Redux from 'redux';
 import * as ReactRedux from 'react-redux';
 
-let nextId = 0;
+import Action from './actions';
+import todosReducer from './reducers/todosReducer';
+import visibilityFilterReducer from './reducers/visibilityFilterReducer';
 
-////// Action
-const Action = {
-	setVisibilityFilter: filter => ({
-		type: 'SET_VISIBILITY_FILTER',
-		filter
-	}),
-	addTodo: text => ({ 
-		type: 'ADD_TODO',
-		id: ++nextId,
-		text
-	}),
-	toogleTodo: todo => ({
-		type: 'TOOGLE_TODO',
-		todo
-	})
-}
-
-////// Reducers
-const todoReducer = (state = {}, action) => {
-	switch (action.type) {
-		case 'ADD_TODO':
-			return {
-				id: action.id,
-				text: action.text,
-				done: false
-			};
-		case 'TOOGLE_TODO':
-			if (state.id !== action.todo.id)
-				return state;
-			return {
-				...state,
-				done: !state.done
-			}
-		default:
-			return state;
-	}
-}
-
-const todosReducer = (state = [], action) => {
-	switch (action.type) {
-		case 'ADD_TODO':
-			return [...state, todoReducer(null, action)];
-		case 'TOOGLE_TODO':
-			return state.map(todo => todoReducer(todo, action))
-			// return state.map(todo => {
-			// 	if (todo.id !== action.todo.id)
-			// 		return todo;
-			// 	return {...todo, done: !action.todo.done}
-			// })
-			
-		// case 'REMOVE_TODO':
-		// 	const our = state.findIndex(t => t.id === todo.id);
-		// 	return [
-		// 		...state.slice(0, our),
-		// 		...state.slice(our + 1),
-		// 	];
-		default:
-			return state;
-	}
-}
-
-const visibilityReducer = (state = 'ALL', action) => {
-	switch (action.type) {
-		case 'SET_VISIBILITY_FILTER':
-			return action.filter
-		default:
-			return state;
-	}
-}
+import Link from './components/Link'
+import TodoList from './components/TodoList'
+import AddTodoForm from './components/AddTodoForm'
 
 ////// Store
 const realStore = Redux.createStore(Redux.combineReducers({
 	todos: todosReducer,
-	filter: visibilityReducer,
+	filter: visibilityFilterReducer,
 }))
 
 
 ////// Components
-const Link = ({
-	active,
-	onClick = _ => 0,
-	children,
-}) => (
-	active ? <span>{ children }</span> :
-	<a href="" onClick={e => {
-		e.preventDefault();
-		onClick(e);
-	}}>{children}</a>
-)
 
 /* Created before ReactRedux.connect */
 // class ReduxObserver extends React.Component {
@@ -174,73 +99,6 @@ const FilterChange = ReactRedux.connect(
 // 		)
 // 	}
 // }
-
-const Todo = ({
-	onClick,
-	todo
-}) => (
-	<li className={`todo ${todo.done ? 'done' : ''}`}
-		onClick={e => onClick(todo)}>
-		{`[${todo.id}] ${todo.text}`}
-	</li>
-)
-
-const TodoList = ({
-	todos,
-	onClickTodo,
-}) => (
-	<ul className="todos">
-		{todos.map(todo => (
-			<Todo key={todo.id}
-				onClick={onClickTodo}
-				todo={todo}
-			 />
-		))}
-	</ul>
-)
-
-/* Não refatorado pelo uso do state */
-class AddTodoForm extends React.Component {
-	static contextTypes = {
-		store: PropTypes.object
-	}
-
-	constructor(props) {
-		super(props);
-
-		this.state = {
-			text: ''
-		}
-	}
-
-	onAddTodoSubmit(e) {
-		e.preventDefault();
-		const { text } = this.state;
-		this.context.store.dispatch(Action.addTodo(text))
-		// this.props.addTodo(nextId, text)
-		this.setState({ text: '' });
-	}
-
-	onChange({target: {name, value}}) {
-		this.setState({
-			[name]: value
-		});
-	}
-
-	render() {
-		return (
-			<div className="bar">
-				<form onSubmit={e => this.onAddTodoSubmit(e)}>
-					<input
-						name="text" 
-						value={this.state.text}
-						onChange={e => this.onChange(e)} />
-					<button>+</button>
-				</form>
-			</div>
-		)	
-	}
-}
 
 const TodosFilterSettings = ({
 	filters
