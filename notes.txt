@@ -19,3 +19,9 @@ como mudamos apenas o filter, o novo objeto na chave "todos" referencia o "todos
 Mandameentos:
 	classes definem comportamento
 	function components são apenas UI
+
+
+
+
+==== Bulding React Applications with Idiomatic Redux:
+createStore(reducer[, initialState]) // passe no initial state os dados do servidor, por exemplo

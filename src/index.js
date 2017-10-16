@@ -1,5 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+// import { Router, Route, HashHistory} from 'react-router-dom';
+// import { hashHistory } from 'react-router-dom';
 // import PropTypes from 'prop-types';
 
 import './App.css';
@@ -16,12 +20,18 @@ import Link from './components/Link'
 import TodoList from './components/TodoList'
 import AddTodoForm from './components/AddTodoForm'
 
+import { loadState, saveState } from './localStorage';
+
 ////// Store
 const realStore = Redux.createStore(Redux.combineReducers({
 	todos: todosReducer,
 	filter: visibilityFilterReducer,
-}))
+}), loadState())
+console.log(loadState());
 
+realStore.subscribe(() => saveState({
+	todos: realStore.getState().todos // salvando apenas o state releante, não os filtros que são apenas de UI
+}))
 
 ////// Components
 
@@ -219,7 +229,11 @@ class TodoApp extends React.Component {
 
 ReactDOM.render(
 	<ReactRedux.Provider store={realStore}>
-		<TodoApp />
+		<BrowserRouter>
+			<Switch>
+				<Route path="/" exact component={TodoApp} />
+			</Switch>
+		</BrowserRouter>
 	</ReactRedux.Provider>,
 	document.getElementById('root')
 )

@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Action from '../../actions';
 
+// let nextId = 0;
 /* Não refatorado pelo uso do state */
 export default class AddTodoForm extends React.Component {
 	static contextTypes = {
