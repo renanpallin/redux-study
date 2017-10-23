@@ -14,24 +14,35 @@ import * as ReactRedux from 'react-redux';
 
 import Action from './actions';
 import todosReducer from './reducers/todosReducer';
-import visibilityFilterReducer from './reducers/visibilityFilterReducer';
+// foi para o router
+// import visibilityFilterReducer from './reducers/visibilityFilterReducer';
 
 import Link from './components/Link'
 import TodoList from './components/TodoList'
 import AddTodoForm from './components/AddTodoForm'
 
-import { loadState, saveState } from './localStorage';
+// import { devToolsEnhancer } from 'redux-devtools-extension';
+import { composeWithDevTools } from 'redux-devtools-extension';
+
+
+// import { loadState, saveState } from './localStorage';
+
+// import todosAPI from './backend/todos';
+
+// todosAPI('ALL').then(console.log)
 
 ////// Store
 const realStore = Redux.createStore(Redux.combineReducers({
-	todos: todosReducer,
-	filter: visibilityFilterReducer,
-}), loadState())
-console.log(loadState());
+	todos: todosReducer
+	// filter: visibilityFilterReducer, // agora isso fica no router
+}), composeWithDevTools(
+	Redux.applyMiddleware()
+)) // loadState()
+// console.log(loadState());
 
-realStore.subscribe(() => saveState({
-	todos: realStore.getState().todos // salvando apenas o state releante, não os filtros que são apenas de UI
-}))
+// realStore.subscribe(() => saveState({
+// 	todos: realStore.getState().todos // salvando apenas o state releante, não os filtros que são apenas de UI
+// }))
 
 ////// Components
 
@@ -56,7 +67,8 @@ realStore.subscribe(() => saveState({
 const FilterChange = ReactRedux.connect(
 	/*  (state, ownProps)  */
 	({ filter: currentFilter }, { filter }) => ({
-		active: currentFilter === filter
+		// active: currentFilter === filter,
+		filter
 	}),
 	/*  (dispatch, ownProps)  */
 	(dispatch, { filter }) => ({
@@ -141,15 +153,26 @@ const filterTodos = (todos = [], filter) => {
 }
 
 /* traditional way */
-const mapStateToProps = state => ({
-	todos: filterTodos(state.todos, state.filter)
+const mapStateToProps = (state, ownProps) => ({
+	todos: filterTodos(state.todos, ownProps.filter)
 });
 
-const mapDispatchToProps = dispatch => ({
-	onClickTodo: todo => dispatch(Action.toogleTodo(todo))
-});
+// const mapDispatchToProps = dispatch => ({
+// 	onClickTodo: todo => dispatch(Action.toogleTodo(todo))
+// });
+
+/*
+Pode-se passar um objeto no mapDispatchToProps quando os parâmetros da
+função match exatamente o que você chama para criar sua action,
+{ propsQueVoceQuerPassar: actionCreatorCujoResultadoIraParaODispatch }
+ */
+const mapDispatchToProps = {
+	onClickTodo: Action.toogleTodo,
+	receiveTodos: Action.receiveTodos
+}
 
 const VisibleTodoList = ReactRedux.connect(
+	// null,
 	mapStateToProps,
 	mapDispatchToProps
 )(TodoList);
@@ -197,9 +220,10 @@ class TodoApp extends React.Component {
 
 		return (
 			<div className="App">
+				<h1>{ JSON.stringify(this.props.match.params) }</h1>
 				<AddTodoForm />
 				<TodosFilterSettings filters={filters} />
-				<VisibleTodoList />
+				<VisibleTodoList filter={this.props.match.params.filter}/>
 			</div>
 		);
 	}
@@ -231,7 +255,7 @@ ReactDOM.render(
 	<ReactRedux.Provider store={realStore}>
 		<BrowserRouter>
 			<Switch>
-				<Route path="/" exact component={TodoApp} />
+				<Route path="/:filter?" exact component={TodoApp} />
 			</Switch>
 		</BrowserRouter>
 	</ReactRedux.Provider>,

@@ -1,15 +1,14 @@
 import React from 'react';
 
+import { NavLink } from 'react-router-dom';
+
 const Link = ({
-	active,
-	onClick = _ => 0,
 	children,
+	filter
 }) => (
-	active ? <span>{ children }</span> :
-	<a href="" onClick={e => {
-		e.preventDefault();
-		onClick(e);
-	}}>{children}</a>
+	<NavLink to={filter} activeStyle={{color: 'blue'}}>
+		{children}
+	</NavLink>
 )
 
 export default Link;

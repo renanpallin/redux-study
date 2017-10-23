@@ -36,6 +36,10 @@ const todosReducer = (state = [], action) => {
 		// 		...state.slice(0, our),
 		// 		...state.slice(our + 1),
 		// 	];
+		case 'RECEIVE_TODOS':
+			console.log('heeh')
+			return action.response
+			// console.log(action)
 		default:
 			return state;
 	}

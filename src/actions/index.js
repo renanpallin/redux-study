@@ -1,4 +1,4 @@
-let nextId = 0;
+import { v4 } from 'uuid';
 
 export default {
 	setVisibilityFilter: filter => ({
@@ -7,11 +7,16 @@ export default {
 	}),
 	addTodo: text => ({ 
 		type: 'ADD_TODO',
-		id: ++nextId,
+		id: v4(),
 		text
 	}),
 	toogleTodo: todo => ({
 		type: 'TOOGLE_TODO',
 		todo
+	}),
+	receiveTodos: (filter, response) => ({
+		type: 'RECEIVE_TODOS',
+		filter,
+		response
 	})
 }

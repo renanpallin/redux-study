@@ -25,3 +25,15 @@ Mandameentos:
 
 ==== Bulding React Applications with Idiomatic Redux:
 createStore(reducer[, initialState]) // passe no initial state os dados do servidor, por exemplo
+
+Selectors:::
+	- Funções que preparam dados do state para mostrar na UI
+	- funções como o getVisibleTodos que filtram o state para montar objetos a serem representados pelos components de UI são chamados de selectors
+
+
+lembrar de ler daqui a um tempo:
+	React:
+		- Toda a doc (já pode ler quando tiver tempo)
+	Redux:
+		- Toda a doc
+		- Segundo curso de Adam, criador do Redux
