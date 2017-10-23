@@ -5,7 +5,7 @@ const Todo = ({
 	todo
 }) => (
 	<li className={`todo ${todo.done ? 'done' : ''}`}
-		onClick={e => onClick(todo)}>
+		onClick={e => onClick(todo.id)}>
 		{`[${todo.id}] ${todo.text}`}
 	</li>
 )

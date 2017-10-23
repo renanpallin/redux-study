@@ -152,9 +152,11 @@ const filterTodos = (todos = [], filter) => {
 	}
 }
 
+const getAllTodos = state => state.todos.allIds.map(id => state.todos.byId[id]);
+
 /* traditional way */
 const mapStateToProps = (state, ownProps) => ({
-	todos: filterTodos(state.todos, ownProps.filter)
+	todos: filterTodos(getAllTodos(state), ownProps.filter)
 });
 
 // const mapDispatchToProps = dispatch => ({
@@ -262,5 +264,5 @@ ReactDOM.render(
 	document.getElementById('root')
 )
 
-realStore.subscribe(_ => console.log('[REDUX]', realStore.getState()))
+// realStore.subscribe(_ => console.log('[REDUX]', realStore.getState()))
 // store.subscribe(_ => console.log.bind(5, '[REDUX]')(store.getState())) // =)

@@ -1,3 +1,5 @@
+import { combineReducers } from 'redux';
+
 const todoReducer = (state = {}, action) => {
 	switch (action.type) {
 		case 'ADD_TODO':
@@ -7,7 +9,8 @@ const todoReducer = (state = {}, action) => {
 				done: false
 			};
 		case 'TOOGLE_TODO':
-			if (state.id !== action.todo.id)
+			// console.log('toogle todo>>>', state, action)
+			if (state.id !== action.id)
 				return state;
 			return {
 				...state,
@@ -18,31 +21,41 @@ const todoReducer = (state = {}, action) => {
 	}
 }
 
-const todosReducer = (state = [], action) => {
+const byId = (state = {}, action) => {
 	switch (action.type) {
 		case 'ADD_TODO':
-			return [...state, todoReducer(null, action)];
 		case 'TOOGLE_TODO':
-			return state.map(todo => todoReducer(todo, action))
-			// return state.map(todo => {
-			// 	if (todo.id !== action.todo.id)
-			// 		return todo;
-			// 	return {...todo, done: !action.todo.done}
-			// })
-			
-		// case 'REMOVE_TODO':
-		// 	const our = state.findIndex(t => t.id === todo.id);
-		// 	return [
-		// 		...state.slice(0, our),
-		// 		...state.slice(our + 1),
-		// 	];
-		case 'RECEIVE_TODOS':
-			console.log('heeh')
-			return action.response
+			// return state.map(todo => todoReducer(todo, action));
+			// console.log('on byid:', state, action);
+			return {
+				...state,
+				[action.id]: todoReducer(state[action.id], action)
+			};
+		// case 'RECEIVE_TODOS':
+		// 	console.log('heeh')
+		// 	return action.response
 			// console.log(action)
 		default:
 			return state;
 	}
 }
+
+const allIds = (state = [], action) => {
+	switch (action.type) {
+		case 'ADD_TODO':
+			return [...state, action.id];
+		// case 'RECEIVE_TODOS':
+		// 	console.log('heeh')
+		// 	return action.response
+		// 	// console.log(action)
+		default:
+			return state;
+	}
+}
+
+const todosReducer = combineReducers({
+	byId,
+	allIds
+})
 
 export default todosReducer

@@ -10,9 +10,9 @@ export default {
 		id: v4(),
 		text
 	}),
-	toogleTodo: todo => ({
+	toogleTodo: id => ({
 		type: 'TOOGLE_TODO',
-		todo
+		id
 	}),
 	receiveTodos: (filter, response) => ({
 		type: 'RECEIVE_TODOS',
