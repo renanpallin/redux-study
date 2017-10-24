@@ -36,6 +36,7 @@ class TodoListWrapper extends React.Component {
 	}
 
 	fetchData() {
+		this.props.requestTodos(this.currentFilter);
 		API(this.currentFilter)
 			.then(data => this.props.receiveTodos(this.currentFilter, data))
 	}
@@ -49,14 +50,20 @@ class TodoListWrapper extends React.Component {
 const TodoList = ({
 	todos = [],
 	onClickTodo,
+	isFetching,
 }) => (
 	<ul className="todos">
-		{todos.map(todo => (
+		{
+			todos.map(todo => (
 			<Todo key={todo.id}
 				onClick={onClickTodo}
 				todo={todo}
 			 />
 		))}
+		{
+			isFetching ?
+			<p>loading...</p>: ''
+		}
 	</ul>
 )
 

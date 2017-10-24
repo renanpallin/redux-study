@@ -152,16 +152,28 @@ const TodosFilterSettings = ({
 // 	}
 // }
 
-const getAllTodos = state => state.todos.allIds.map(id => state.todos.byId[id]);
+// const getAllTodos = state => state.todos.allIds.map(id => state.todos.byId[id]);
 
+/* esses getters podem ficar no mesmo arquivo do reducer que trata o 
+state correspondente a ele. A ideia é que você possa alterar o shape
+do seu state sem se preoupar com outros arquivos ou dependências,
+encapsulando cada ramo do state em um único módulo.
+Eles receberiam, no caso, apenas a parte de todos, não sendo necessário
+acessar por state.todos, mas apenas por state, uma vez que o state
+daquela módulo serão os todos */
 const getVisibleTodos = (state, filter) => {
-	const ids = state.todos.idsByFilter[filter];
+	const ids = state.todos.idsByFilter[filter].ids;
 	return ids.map(id => state.todos.byId[id])
+}
+
+const getIsFetching = (state, filter) => {
+	return state.todos.idsByFilter[filter].isFetching
 }
 
 /* traditional way */
 const mapStateToProps = (state, ownProps) => ({
-	todos: getVisibleTodos(state, ownProps.filter)
+	todos: getVisibleTodos(state, ownProps.filter),
+	isFetching: getIsFetching(state, ownProps.filter)
 	// todos: filterTodos(getAllTodos(state), ownProps.filter)
 });
 
@@ -174,9 +186,11 @@ Pode-se passar um objeto no mapDispatchToProps quando os parâmetros da
 função match exatamente o que você chama para criar sua action,
 { propsQueVoceQuerPassar: actionCreatorCujoResultadoIraParaODispatch }
  */
+// const mapDispatchToProps = Action;
 const mapDispatchToProps = {
 	onClickTodo: Action.toogleTodo,
-	receiveTodos: Action.receiveTodos
+	receiveTodos: Action.receiveTodos,
+	requestTodos: Action.requestTodos
 }
 
 const VisibleTodoList = ReactRedux.connect(

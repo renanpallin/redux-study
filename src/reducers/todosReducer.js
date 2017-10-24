@@ -27,7 +27,7 @@ const byId = (state = {}, action) => {
 			return action.response.reduce((newState, todo) => {
 				newState[todo.id] = todo;
 				return newState;
-			}, {});
+			}, state);
 
 		// case 'ADD_TODO':
 		// case 'TOOGLE_TODO':
@@ -46,55 +46,76 @@ const byId = (state = {}, action) => {
 	}
 }
 
-const allIds = (state = [], action) => {
-	if (action.filter !== 'ALL')
-		return state;
-
-	switch (action.type) {
-		case 'RECEIVE_TODOS':
-			return action.response.map(todo => todo.id);
-
-		// case 'ADD_TODO':
-		// 	return [...state, action.id];
-		// case 'RECEIVE_TODOS':
-		// 	console.log('heeh')
-		// 	return action.response
-		// 	// console.log(action)
-		default:
+const createList = (filter) => {
+	return combineReducers({
+		ids: (state = [], action) => {
+			if (action.filter !== filter)
+				return state;
+			if (action.type === 'RECEIVE_TODOS')
+				return action.response.map(todo => todo.id)
 			return state;
-	}
+		},
+		isFetching: (state = false, action) => {
+			if (action.filter !== filter)
+				return state;
+			if (action.type === 'REQUEST_TODOS')
+				return true;
+			if (action.type === 'RECEIVE_TODOS')
+				return false;
+			return state;
+		}
+	})
 }
 
-const activeIds = (state = [], action) => {
-	if (action.filter !== 'ACTIVE')
-		return state;
+// const allIds = (state = [], action) => {
+// 	if (action.filter !== 'ALL')
+// 		return state;
 
-	switch (action.type) {
-		case 'RECEIVE_TODOS':
-			return action.response.map(todo => todo.id);
-		default:
-			return state;
-	}
-}
+// 	switch (action.type) {
+// 		case 'RECEIVE_TODOS':
+// 			return action.response.map(todo => todo.id);
 
-const completedIds = (state = [], action) => {
-	if (action.filter !== 'COMPLETED')
-		return state;
+// 		// case 'ADD_TODO':
+// 		// 	return [...state, action.id];
+// 		// case 'RECEIVE_TODOS':
+// 		// 	console.log('heeh')
+// 		// 	return action.response
+// 		// 	// console.log(action)
+// 		default:
+// 			return state;
+// 	}
+// }
 
-	switch (action.type) {
-		case 'RECEIVE_TODOS':
-			return action.response.map(todo => todo.id);
-		default:
-			return state;
-	}
-}
+// const activeIds = (state = [], action) => {
+// 	if (action.filter !== 'ACTIVE')
+// 		return state;
+
+// 	switch (action.type) {
+// 		case 'RECEIVE_TODOS':
+// 			return action.response.map(todo => todo.id);
+// 		default:
+// 			return state;
+// 	}
+// }
+
+// const completedIds = (state = [], action) => {
+// 	if (action.filter !== 'COMPLETED')
+// 		return state;
+
+// 	switch (action.type) {
+// 		case 'RECEIVE_TODOS':
+// 			return action.response.map(todo => todo.id);
+// 		default:
+// 			return state;
+// 	}
+// }
 
 const todosReducer = combineReducers({
 	byId,
 	idsByFilter: combineReducers({
-		ALL: allIds,
-		ACTIVE: activeIds,
-		COMPLETED: completedIds,
+		ALL: createList('ALL'),
+		ACTIVE: createList('ACTIVE'),
+		COMPLETED: createList('COMPLETED'),
 	})
 })
 

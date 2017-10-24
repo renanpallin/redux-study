@@ -14,6 +14,12 @@ export default {
 		type: 'TOOGLE_TODO',
 		id
 	}),
+	requestTodos(filter) {
+		return {
+			type: 'REQUEST_TODOS',
+			filter
+		}
+	},
 	receiveTodos: (filter, response) => ({
 		type: 'RECEIVE_TODOS',
 		filter,
