@@ -30,6 +30,9 @@ Selectors:::
 	- Funções que preparam dados do state para mostrar na UI
 	- funções como o getVisibleTodos que filtram o state para montar objetos a serem representados pelos components de UI são chamados de selectors
 
+Dan Abramov (criador do Redux) prefere passar a função de Promise.reject como segundo argumento no Promise.prototype.then em vez de implementar um Promise.prototype.catch porque no cenário then(...).catch(...), caso algo ocorra no tratamento do then, o catch poderá mostrar erros internos para o usuário, e não os que você quer. Passando ambos no then garante que apenas os erros de sua api (ou seja lá de onde veio essa tua promise) serão tratados.
+Renan Pallin prefere simplesmente chamar o catch antes do then e ta tudo resolvido.
+
 
 lembrar de ler daqui a um tempo:
 	React:

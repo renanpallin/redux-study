@@ -20,7 +20,9 @@ export default class AddTodoForm extends React.Component {
 	onAddTodoSubmit(e) {
 		e.preventDefault();
 		const { text } = this.state;
-		this.context.store.dispatch(Action.addTodo(text))
+		this.props.saveTodo(text)
+		// Action.addTodo(text);
+		// this.context.store.dispatch(Action.addTodo(text))
 		// this.props.addTodo(nextId, text)
 		this.setState({ text: '' });
 	}

@@ -28,6 +28,11 @@ const byId = (state = {}, action) => {
 				newState[todo.id] = todo;
 				return newState;
 			}, state);
+		case 'ADD_TODO_SUCCESS':
+			return {
+				...state,
+				[action.response.id]: action.response
+			};
 
 		// case 'ADD_TODO':
 		// case 'TOOGLE_TODO':
@@ -49,10 +54,14 @@ const byId = (state = {}, action) => {
 const createList = (filter) => {
 	return combineReducers({
 		ids: (state = [], action) => {
-			if (action.filter !== filter)
-				return state;
 			if (action.type === 'RECEIVE_TODOS')
-				return action.response.map(todo => todo.id)
+				return action.filter === filter ? 
+					action.response.map(todo => todo.id) :
+					state;
+			if (action.type === 'ADD_TODO_SUCCESS')
+				return action.filter !== 'completed' ?
+					[...state, action.response.id]:
+					state;
 			return state;
 		},
 		isFetching: (state = false, action) => {

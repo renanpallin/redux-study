@@ -1,3 +1,5 @@
+import { v4 } from 'uuid'
+
 const todos = [{
 	  "id": "41824ea8-1239-4b32-861b-8620db705167",
 	  "text": "Alcelaphus buselaphus cokii",
@@ -80,9 +82,9 @@ const todos = [{
 	  "done": true
 	}]
 
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
+const delay = (ms = 500) => new Promise(resolve => setTimeout(resolve, ms))
 
-export default filter => delay(500).then(() => {
+export default filter => delay().then(() => {
 	switch (filter) {
 		case 'ALL':
 			return todos;
@@ -94,3 +96,22 @@ export default filter => delay(500).then(() => {
 			return [];
 	}
 })
+
+export const addTodo = (text) => delay().then(() => {
+	const todo = {
+		id: v4(),
+		text,
+		done:false,
+	};
+	todos.push(todo);
+	return todo;
+})
+
+
+export const toogleTodo = (id) => {
+	delay().then(() => {
+		const todo = todos.find(t => t.id === id);
+		todo.done = true;
+		return todo;
+	})
+}

@@ -12,6 +12,8 @@ import './index.css';
 import * as Redux from 'redux';
 import * as ReactRedux from 'react-redux';
 
+import thunk from 'redux-thunk';
+
 import Action from './actions';
 import todosReducer from './reducers/todosReducer';
 // foi para o router
@@ -36,7 +38,7 @@ const realStore = Redux.createStore(Redux.combineReducers({
 	todos: todosReducer
 	// filter: visibilityFilterReducer, // agora isso fica no router
 }), composeWithDevTools(
-	Redux.applyMiddleware()
+	Redux.applyMiddleware(thunk)
 )) // loadState()
 // console.log(loadState());
 
@@ -154,7 +156,9 @@ const TodosFilterSettings = ({
 
 // const getAllTodos = state => state.todos.allIds.map(id => state.todos.byId[id]);
 
-/* esses getters podem ficar no mesmo arquivo do reducer que trata o 
+/* 
+SELECTORS: Funções que selecionam algo do state
+esses getters podem ficar no mesmo arquivo do reducer que trata o 
 state correspondente a ele. A ideia é que você possa alterar o shape
 do seu state sem se preoupar com outros arquivos ou dependências,
 encapsulando cada ramo do state em um único módulo.
@@ -231,6 +235,21 @@ connect(null, dispatch => { dispatch })
 // 	}
 // }
 
+const AddTodoFormConnected = ReactRedux.connect(
+	null,
+	dispatch => ({ 
+		saveTodo: text => Action.addTodo(text)(dispatch)
+	})
+)
+(AddTodoForm)
+
+/////
+/// TEST:
+console.log('iniciando testes')
+console.log(Action.addTodo('oi')(realStore.dispatch))
+// realStore.dispatch(Action.addTodo('oi')(realStore.dispatch))
+
+/////
 class TodoApp extends React.Component {
 	render() {
 		/* Poderia ficar no próprio TodosFilterSettings, mas acho que tem amis a ver com a aplicação */
@@ -243,7 +262,7 @@ class TodoApp extends React.Component {
 		return (
 			<div className="App">
 				<h1>{ JSON.stringify(this.props.match.params) }</h1>
-				<AddTodoForm />
+				<AddTodoFormConnected />
 				<TodosFilterSettings filters={filters} />
 				<VisibleTodoList filter={this.props.match.params.filter}/>
 			</div>
