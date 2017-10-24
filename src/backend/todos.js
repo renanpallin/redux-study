@@ -82,7 +82,7 @@ const todos = [{
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-export default filter => delay(5000).then(() => {
+export default filter => delay(500).then(() => {
 	switch (filter) {
 		case 'ALL':
 			return todos;

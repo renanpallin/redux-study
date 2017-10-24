@@ -140,23 +140,29 @@ const TodosFilterSettings = ({
 	</div>
 )
 
-const filterTodos = (todos = [], filter) => {
-	switch (filter) {
-		case 'ACTIVE':
-			return todos.filter(todo => !todo.done);
-		case 'COMPLETED':
-			return todos.filter(todo => todo.done);
-		case 'ALL':
-		default:
-			return todos;
-	}
-}
+// const filterTodos = (todos = [], filter) => {
+// 	switch (filter) {
+// 		case 'ACTIVE':
+// 			return todos.filter(todo => !todo.done);
+// 		case 'COMPLETED':
+// 			return todos.filter(todo => todo.done);
+// 		case 'ALL':
+// 		default:
+// 			return todos;
+// 	}
+// }
 
 const getAllTodos = state => state.todos.allIds.map(id => state.todos.byId[id]);
 
+const getVisibleTodos = (state, filter) => {
+	const ids = state.todos.idsByFilter[filter];
+	return ids.map(id => state.todos.byId[id])
+}
+
 /* traditional way */
 const mapStateToProps = (state, ownProps) => ({
-	todos: filterTodos(getAllTodos(state), ownProps.filter)
+	todos: getVisibleTodos(state, ownProps.filter)
+	// todos: filterTodos(getAllTodos(state), ownProps.filter)
 });
 
 // const mapDispatchToProps = dispatch => ({
