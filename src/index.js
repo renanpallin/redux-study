@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 // import { Router, Route, HashHistory} from 'react-router-dom';
 // import { hashHistory } from 'react-router-dom';
 // import PropTypes from 'prop-types';
@@ -296,7 +296,8 @@ ReactDOM.render(
 	<ReactRedux.Provider store={realStore}>
 		<BrowserRouter>
 			<Switch>
-				<Route path="/:filter?" exact component={TodoApp} />
+				<Route path="/:filter" exact component={TodoApp} />
+				<Route path="/" exact component={props => <Redirect to="/ALL" />} />
 			</Switch>
 		</BrowserRouter>
 	</ReactRedux.Provider>,
